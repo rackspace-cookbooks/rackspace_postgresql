@@ -11,4 +11,3 @@ Gemfile.lock
 .cache
 .kitchen
 bin
-.kitchen.local.yml

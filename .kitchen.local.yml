@@ -1,0 +1,25 @@
+---
+driver_plugin: openstack
+driver_config:
+  require_chef_omnibus: latest
+  openstack_username: <%= ENV['OS_USERNAME'] %>
+  openstack_api_key:  <%= ENV['OS_PASSWORD'] %>
+  openstack_auth_url:  <%= "#{ENV['OS_AUTH_URL']}/tokens" %>
+  public_key_path: <%= ENV['SSH_KEY_FILE'] %>
+  openstack_tenant: <%= ENV['OS_TENANT'] %>
+  disable_ssl_verification: true
+  key_name: jenkins
+
+platforms:
+- name: ubuntu-12.04
+  driver_config:
+    image_ref: <%= ENV['UBUNTU_1204'] %>
+    flavor_ref: 1
+    username: ubuntu
+  run_list:
+  - recipe[apt]
+- name: centos-6.4
+  driver_config:
+    image_ref: <%= ENV['CENTOS_64'] %>
+    flavor_ref: 1
+    username: stack
