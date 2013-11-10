@@ -57,6 +57,13 @@ The following attributes are set based on the platform, see the
   by the PostgreSQL Global Development Group, which contains newer versions
   of PostgreSQL.
 
+* `node['postgresql']['initdb_locale']` - Sets the default locale for the
+  database cluster. If this attribute is not specified, the locale is
+  inherited from the environment that initdb runs in. Sometimes you must
+  have a system locale that is not what you want for your database cluster,
+  and this attribute addresses that scenario. Valid only for EL-family
+  distros (RedHat/Centos/etc.).
+
 The following attributes are generated in
 `recipe[postgresql::server]`.
 
@@ -109,6 +116,11 @@ Will result in the following config lines:
     port = 5432
 
 (no line printed for `ident_file` as it is `nil`)
+
+Note that the `unix_socket_directory` configuration was renamed to
+`unix_socket_directories` in Postgres 9.3 so make sure to use the
+`node['postgresql']['unix_socket_directories']` attribute instead of
+`node['postgresql']['unix_socket_directory']`.
 
 The `pg_hba.conf` file is dynamically generated from the
 `node['postgresql']['pg_hba']` attribute. This attribute must be an
