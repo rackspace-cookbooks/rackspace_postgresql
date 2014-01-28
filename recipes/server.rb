@@ -55,9 +55,9 @@ end
 # since they do things slightly differently.
 case node['platform_family']
 when 'rhel'
-  include_recipe 'postgresql::server_redhat'
+  include_recipe 'rackspace_postgresql::server_redhat'
 when 'debian'
-  include_recipe 'postgresql::server_debian'
+  include_recipe 'rackspace_postgresql::server_debian'
 end
 
 change_notify = node['rackspace_postgresql']['server']['config_change_notify']
