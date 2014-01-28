@@ -9,14 +9,12 @@ Requirements
 ## Platforms
 
 * Debian, Ubuntu
-* Red Hat/CentOS/Scientific (6.0+ required) - "EL6-family"
-* Fedora
-* SUSE
+* Red Hat/CentOS
 
 Tested on:
 
-* Ubuntu 10.04, 11.10, 12.04
-* Red Hat 6.1, Scientific 6.1, CentOS 6.3
+* Ubuntu 12.04
+* CentOS 6.3
 
 ## Cookbooks
 
@@ -25,10 +23,10 @@ Requires Opscode's `openssl` cookbook for secure password generation.
 Requires a C compiler and development headers in order to build the
 `pg` RubyGem to provide Ruby bindings in the `ruby` recipe.
 
-Opscode's `build-essential` cookbook provides this functionality on
+Rackspace's `rackspace_build_essential` cookbook provides this functionality on
 Debian, Ubuntu, and EL6-family.
 
-While not required, Opscode's `database` cookbook contains resources
+While not required, Rackspace's `rackspace_database` cookbook contains resources
 and providers that can interact with a PostgreSQL database. This
 cookbook is a dependency of database.
 
@@ -38,28 +36,28 @@ Attributes
 The following attributes are set based on the platform, see the
 `attributes/default.rb` file for default values.
 
-* `node['postgresql']['version']` - version of postgresql to manage
-* `node['postgresql']['dir']` - home directory of where postgresql
+* `node['rackspace_postgresql']['version']` - version of postgresql to manage
+* `node['rackspace_postgresql']['dir']` - home directory of where postgresql
   data and configuration lives.
 
-* `node['postgresql']['client']['packages']` - An array of package names
+* `node['rackspace_postgresql']['client']['packages']` - An array of package names
   that should be installed on "client" systems.
-* `node['postgresql']['server']['packages']` - An array of package names
+* `node['rackspace_postgresql']['server']['packages']` - An array of package names
   that should be installed on "server" systems.
-* `node['postgresql']['server']['config_change_notify']` - Type of
+* `node['rackspace_postgresql']['server']['config_change_notify']` - Type of
   notification triggered when a config file changes.
-* `node['postgresql']['contrib']['packages']` - An array of package names
+* `node['rackspace_postgresql']['contrib']['packages']` - An array of package names
   that could be installed on "server" systems for useful sysadmin tools.
 
-* `node['postgresql']['enable_pgdg_apt']` - Whether to enable the apt repo
+* `node['rackspace_postgresql']['enable_pgdg_apt']` - Whether to enable the apt repo
   by the PostgreSQL Global Development Group, which contains newer versions
   of PostgreSQL.
 
-* `node['postgresql']['enable_pgdg_yum']` - Whether to enable the yum repo
+* `node['rackspace_postgresql']['enable_pgdg_yum']` - Whether to enable the yum repo
   by the PostgreSQL Global Development Group, which contains newer versions
   of PostgreSQL.
 
-* `node['postgresql']['initdb_locale']` - Sets the default locale for the
+* `node['rackspace_postgresql']['initdb_locale']` - Sets the default locale for the
   database cluster. If this attribute is not specified, the locale is
   inherited from the environment that initdb runs in. Sometimes you must
   have a system locale that is not what you want for your database cluster,
@@ -67,9 +65,9 @@ The following attributes are set based on the platform, see the
   distros (RedHat/Centos/etc.).
 
 The following attributes are generated in
-`recipe[postgresql::server]`.
+`recipe[rackspace_postgresql::server]`.
 
-* `node['postgresql']['password']['postgres']` - randomly generated
+* `node['rackspace_postgresql']['password']['postgres']` - randomly generated
   password by the `openssl` cookbook's library.
   (TODO: This is broken, as it disables the password.)
 
@@ -77,11 +75,11 @@ Configuration
 -------------
 
 The `postgresql.conf` and `pg_hba.conf` files are dynamically
-generated from attributes. Each key in `node['postgresql']['config']`
+generated from attributes. Each key in `node['rackspace_postgresql']['config']`
 is a postgresql configuration directive, and will be rendered in the
 config file. For example, the attribute:
 
-    node['postgresql']['config']['listen_addresses'] = 'localhost'
+    node['rackspace_postgresql']['config']['listen_addresses'] = 'localhost'
 
 Will result in the following line in the `postgresql.conf` file:
 
@@ -106,10 +104,10 @@ configuration option set to the literal `nil` will be skipped
 entirely. All other values (e.g., numeric literals) will be used as
 is. So for example:
 
-    node.default['postgresql']['config']['logging_collector'] = true
-    node.default['postgresql']['config']['datestyle'] = 'iso, mdy'
-    node.default['postgresql']['config']['ident_file'] = nil
-    node.default['postgresql']['config']['port] = 5432
+    node.default['rackspace_postgresql']['config']['logging_collector'] = true
+    node.default['rackspace_postgresql']['config']['datestyle'] = 'iso, mdy'
+    node.default['rackspace_postgresql']['config']['ident_file'] = nil
+    node.default['rackspace_postgresql']['config']['port] = 5432
 
 Will result in the following config lines:
 
@@ -121,16 +119,16 @@ Will result in the following config lines:
 
 Note that the `unix_socket_directory` configuration was renamed to
 `unix_socket_directories` in Postgres 9.3 so make sure to use the
-`node['postgresql']['unix_socket_directories']` attribute instead of
-`node['postgresql']['unix_socket_directory']`.
+`node['rackspace_postgresql']['unix_socket_directories']` attribute instead of
+`node['rackspace_postgresql']['unix_socket_directory']`.
 
 The `pg_hba.conf` file is dynamically generated from the
-`node['postgresql']['pg_hba']` attribute. This attribute must be an
+`node['rackspace_postgresql']['pg_hba']` attribute. This attribute must be an
 array of hashes, each hash containing the authorization data. As it is
 an array, you can append to it in your own recipes. The hash keys in
 the array must be symbols. Each hash will be written as a line in
 `pg_hba.conf`. For example, this entry from
-`node['postgresql']['pg_hba']`:
+`node['rackspace_postgresql']['pg_hba']`:
 
     {:comment => '# Optional comment',
     :type => 'local', :db => 'all', :user => 'postgres', :addr => nil, :method => 'md5'}
@@ -146,7 +144,7 @@ Don't provide a comment if none is desired in the `pg_hba.conf` file.
 Note that the following authorization rule is supplied automatically by
 the cookbook template. The cookbook needs this to execute SQL in the
 PostgreSQL server without supplying the clear-text password (which isn't
-known by the cookbook). Therefore, your `node['postgresql']['pg_hba']`
+known by the cookbook). Therefore, your `node['rackspace_postgresql']['pg_hba']`
 attributes don't need to specify this authorization rule:
 
     # "local" is for Unix domain socket connections only
@@ -167,7 +165,7 @@ client
 ------
 
 Installs the packages defined in the
-`node['postgresql']['client']['packages']` attribute.
+`node['rackspace_postgresql']['client']['packages']` attribute.
 
 ruby
 ----
@@ -202,7 +200,7 @@ server\_debian
 --------------
 
 Installs the postgresql server packages and sets up the service. You
-should include the `postgresql::server` recipe, which will include
+should include the `rackspace_postgresql::server` recipe, which will include
 this on Debian platforms.
 
 server\_redhat
@@ -211,14 +209,14 @@ server\_redhat
 Manages the postgres user and group (with UID/GID 26, per RHEL package
 conventions), installs the postgresql server packages, initializes the
 database, and manages the postgresql service. You should include the
-`postgresql::server` recipe, which will include this on RHEL/Fedora
+`rackspace_postgresql::server` recipe, which will include this on RHEL/Fedora
 platforms.
 
 config\_initdb
 --------------
 
 Takes locale and timezone settings from the system configuration.
-This recipe creates `node.default['postgresql']['config']` attributes
+This recipe creates `node.default['rackspace_postgresql']['config']` attributes
 that conform to the system's locale and timezone. In addition, this
 recipe creates the same error reporting and logging settings that
 `initdb` provided: a rotation of 7 days of log files named
@@ -231,7 +229,7 @@ or when growing to 10MB. The Chef installation could include the
 `postgresql::config_initdb` recipe for the locale and timezone settings,
 but customize the logging settings with these node JSON attributes:
 
-    "postgresql": {
+    "rackspace_postgresql": {
       "config": {
         "log_rotation_age": "1d",
         "log_rotation_size": "10MB",
@@ -239,7 +237,7 @@ but customize the logging settings with these node JSON attributes:
       }
     }
 
-Credits: This `postgresql::config_initdb` recipe is based on algorithms
+Credits: This `rackspace_postgresql::config_initdb` recipe is based on algorithms
 in the [source code](http://doxygen.postgresql.org/initdb_8c_source.html)
 for the PostgreSQL `initdb` utility.
 
@@ -267,16 +265,16 @@ This recipe uses a performance model with three input parameters.
 These node attributes are completely optional, but it is obviously
 important to choose the `db_type` correctly:
 
- * `node['postgresql']['config_pgtune']['db_type']` --
+ * `node['rackspace_postgresql']['config_pgtune']['db_type']` --
    Specifies database type from the list of five choices above.
    If not specified, the default is "mixed".
 
- * `node['postgresql']['config_pgtune']['max_connections']` --
+ * `node['rackspace_postgresql']['config_pgtune']['max_connections']` --
    Specifies maximum number of connections expected.
    If not specified, it depends on database type:
    "web":200, "oltp":300, "dw":20, "mixed":80, "desktop":5
 
- * `node['postgresql']['config_pgtune']['total_memory']` --
+ * `node['rackspace_postgresql']['config_pgtune']['total_memory']` --
    Specifies total system memory in kB. (E.g., "49416564kB".)
    If not specified, it will be taken from Ohai automatic attributes.
    This could be used to tune a system that isn't a dedicated database.
@@ -286,7 +284,7 @@ normal attributes because of Chef attribute precedence. For example, if
 you are running application benchmarks to try different buffer cache
 sizes, you would experiment with this node JSON attribute:
 
-    "postgresql": {
+    "rackspace_postgresql": {
       "config": {
         "shared_buffers": "3GB"
       }
@@ -294,10 +292,10 @@ sizes, you would experiment with this node JSON attribute:
 
 Note that the recipe uses `max_connections` in its computations. If
 you want to override that setting, you should specify
-`node['postgresql']['config_pgtune']['max_connections']` instead of
-`node['postgresql']['config']['max_connections']`.
+`node['rackspace_postgresql']['config_pgtune']['max_connections']` instead of
+`node['rackspace_postgresql']['config']['max_connections']`.
 
-Credits: This `postgresql::config_pgtune` recipe is based on the
+Credits: This `rackspace_postgresql::config_pgtune` recipe is based on the
 [pgtune python script](https://github.com/gregs1104/pgtune)
 developed by
 [Greg Smith](http://notemagnet.blogspot.com/2008/11/automating-initial-postgresqlconf.html)
@@ -308,14 +306,14 @@ contrib
 -------
 
 Installs the packages defined in the
-`node['postgresql']['contrib']['packages']` attribute. The contrib
+`node['rackspace_postgresql']['contrib']['packages']` attribute. The contrib
 directory of the PostgreSQL distribution includes porting tools,
 analysis utilities, and plug-in features that database engineers often
 require. Some (like `pgbench`) are executable. Others (like
 `pg_buffercache`) would need to be installed into the database.
 
 Also installs any contrib module extensions defined in the
-`node['postgresql']['contrib']['extensions']` attribute. These will be
+`node['rackspace_postgresql']['contrib']['extensions']` attribute. These will be
 available in any subsequently created databases in the cluster, because
 they will be installed into the `template1` database using the
 `CREATE EXTENSION` command. For example, it is often necessary/helpful
@@ -323,7 +321,7 @@ for problem troubleshooting and maintenance planning to install the
 views and functions in these [standard instrumentation extensions]
 (http://www.postgresql.org/message-id/flat/4DC32600.6080900@pgexperts.com#4DD3D6C6.5060006@2ndquadrant.com):
 
-    node['postgresql']['contrib']['extensions'] = [
+    node['rackspace_postgresql']['contrib']['extensions'] = [
       "pageinspect",
       "pg_buffercache",
       "pg_freespacemap",
@@ -335,7 +333,7 @@ views and functions in these [standard instrumentation extensions]
 Note that the `pg_stat_statements` view only works if `postgresql.conf`
 loads its shared library, which can be done with this node attribute:
 
-    node['postgresql']['config']['shared_preload_libraries'] = 'pg_stat_statements'
+    node['rackspace_postgresql']['config']['shared_preload_libraries'] = 'pg_stat_statements'
 
 apt\_pgdg\_postgresql
 ----------------------
@@ -343,10 +341,10 @@ apt\_pgdg\_postgresql
 Enables the PostgreSQL Global Development Group yum repository
 maintained by Devrim G&#252;nd&#252;z for updated PostgreSQL packages.
 (The PGDG is the groups that develops PostgreSQL.)
-Automatically included if the `node['postgresql']['enable_pgdg_apt']`
+Automatically included if the `node['rackspace_postgresql']['enable_pgdg_apt']`
 attribute is true. Also set the
-`node['postgresql']['client']['packages']` and
-`node['postgresql']['server]['packages']` to the list of packages to
+`node['rackspace_postgresql']['client']['packages']` and
+`node['rackspace_postgresql']['server]['packages']` to the list of packages to
 use from this repository, and set the `node['postgresql']['version']`
 attribute to the version to use (e.g., "9.2").
 
@@ -356,25 +354,25 @@ yum\_pgdg\_postgresql
 Enables the PostgreSQL Global Development Group yum repository
 maintained by Devrim G&#252;nd&#252;z for updated PostgreSQL packages.
 (The PGDG is the groups that develops PostgreSQL.)
-Automatically included if the `node['postgresql']['enable_pgdg_yum']`
+Automatically included if the `node['rackspace_postgresql']['enable_pgdg_yum']`
 attribute is true. Also use `override_attributes` to set a number of
 values that will need to have embedded version numbers. For example:
 
-    node['postgresql']['enable_pgdg_yum'] = true
-    node['postgresql']['version'] = "9.2"
-    node['postgresql']['dir'] = "/var/lib/pgsql/9.2/data"
-    node['postgresql']['client']['packages'] = ["postgresql92", "postgresql92-devel"]
-    node['postgresql']['server']['packages'] = ["postgresql92-server"]
-    node['postgresql']['server']['service_name'] = "postgresql-9.2"
-    node['postgresql']['contrib']['packages'] = ["postgresql92-contrib"]
+    node['rackspace_postgresql']['enable_pgdg_yum'] = true
+    node['rackspace_postgresql']['version'] = "9.2"
+    node['rackspace_postgresql']['dir'] = "/var/lib/pgsql/9.2/data"
+    node['rackspace_postgresql']['client']['packages'] = ["postgresql92", "postgresql92-devel"]
+    node['rackspace_postgresql']['server']['packages'] = ["postgresql92-server"]
+    node['rackspace_postgresql']['server']['service_name'] = "postgresql-9.2"
+    node['rackspace_postgresql']['contrib']['packages'] = ["postgresql92-contrib"]
 
-You may set `node['postgresql']['pgdg']['repo_rpm_url']` attributes
+You may set `node['rackspace_postgresql']['pgdg']['repo_rpm_url']` attributes
 to pick up recent [PGDG repo packages](http://yum.postgresql.org/repopackages.php).
 
 Resources/Providers
 ===================
 
-See the [database](http://community.opscode.com/cookbooks/database)
+See the [rackspace_database](http://github.com/rackspace-cookbooks/rackspace_database)
 for resources and providers that can be used for managing PostgreSQL
 users and databases.
 
@@ -382,31 +380,31 @@ Usage
 =====
 
 On systems that need to connect to a PostgreSQL database, add to a run
-list `recipe[postgresql]` or `recipe[postgresql::client]`.
+list `recipe[rackspace_postgresql]` or `recipe[rackspace_postgresql::client]`.
 
 On systems that should be PostgreSQL servers, use
-`recipe[postgresql::server]` on a run list. This recipe does set a
+`recipe[rackspace_postgresql::server]` on a run list. This recipe does set a
 password for the `postgres` user.
 If you're using `chef server`, if the attribute
-`node['postgresql']['password']['postgres']` is not found,
+`node['rackspace_postgresql']['password']['postgres']` is not found,
 the recipe generates a random password and performs a node.save.
 (TODO: This is broken, as it disables the password.)
 If you're using `chef-solo`, you'll need
-to set the attribute `node['postgresql']['password']['postgres']` in
+to set the attribute `node['rackspace_postgresql']['password']['postgres']` in
 your node's `json_attribs` file or in a role.
 
 On Debian family systems, SSL will be enabled, as the packages on
 Debian/Ubuntu also generate the SSL certificates. If you use another
 platform and wish to use SSL in postgresql, then generate your SSL
 certificates and distribute them in your own cookbook, and set the
-`node['postgresql']['config']['ssl']` attribute to true in your
+`node['rackspace_postgresql']['config']['ssl']` attribute to true in your
 role/cookboook/node.
 
 On server systems, the postgres server is restarted when a configuration
 file changes.  This can be changed to reload only by setting the
 following attribute:
 
-    node['postgresql']['server']['config_change_notify'] = :reload
+    node['rackspace_postgresql']['server']['config_change_notify'] = :reload
 
 Chef Solo Note
 ==============
@@ -418,12 +416,12 @@ save the node object at all, to have the password persist across
 used. For Example:
 
     {
-      "postgresql": {
+      "rackspace_postgresql": {
         "password": {
           "postgres": "iloverandompasswordsbutthiswilldo"
         }
       },
-      "run_list": ["recipe[postgresql::server]"]
+      "run_list": ["recipe[rackspace_postgresql::server]"]
     }
 
 That should actually be the "encrypted password" instead of cleartext,
@@ -444,6 +442,7 @@ License and Author
 - Author:: Lamont Granquist (<lamont@opscode.com>)
 - Author:: Chris Roberts (<chrisroberts.code@gmail.com>)
 - Author:: David Crane (<davidc@donorschoose.org>)
+- Author:: Matthew Thode (<matt.thode@rackspace.com>)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -1,9 +1,11 @@
 #
-# Cookbook Name:: postgresql
+# Cookbook Name:: rackspace_postgresql
 # Recipe:: ruby
 #
 # Author:: Joshua Timberman (<joshua@opscode.com>)
+# Author:: Matthew Thode (<matt.thode@rackspace.com>)
 # Copyright 2012 Opscode, Inc.
+# Copyright 2014 Rackspace, US Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,34 +27,34 @@ begin
   require 'pg'
 rescue LoadError
 
-  node.set['build_essential']['compiletime'] = true
-  include_recipe "build-essential"
-  include_recipe "postgresql::client"
+  node.set['rackspace_build_essential']['compiletime'] = true
+  include_recipe 'rackspace_build_essential'
+  include_recipe 'rackspace_postgresql::client'
 
-  if node['postgresql']['enable_pgdg_yum']
-    repo_rpm_url, repo_rpm_filename, repo_rpm_package = pgdgrepo_rpm_info
-    include_recipe "postgresql::yum_pgdg_postgresql"
+  if node['rackspace_postgresql']['enable_pgdg_yum']
+    _repo_rpm_url, repo_rpm_filename, repo_rpm_package = pgdgrepo_rpm_info
+    include_recipe 'rackspace_postgresql::yum_pgdg_postgresql'
     resources("remote_file[#{Chef::Config[:file_cache_path]}/#{repo_rpm_filename}]").run_action(:create)
     resources("package[#{repo_rpm_package}]").run_action(:install)
-    ENV['PATH'] = "/usr/pgsql-#{node['postgresql']['version']}/bin:#{ENV['PATH']}"
+    ENV['PATH'] = "/usr/pgsql-#{node['rackspace_postgresql']['version']}/bin:#{ENV['PATH']}"
   end
 
-  if node['postgresql']['enable_pgdg_apt']
-    include_recipe "postgresql::apt_pgdg_postgresql"
-    resources("file[remove deprecated Pitti PPA apt repository]").run_action(:delete)
-    resources("apt_repository[apt.postgresql.org]").run_action(:add)
+  if node['rackspace_postgresql']['enable_pgdg_apt']
+    include_recipe 'rackspace_postgresql::apt_pgdg_postgresql'
+    resources('file[remove deprecated Pitti PPA apt repository]').run_action(:delete)
+    resources('rackspace_apt_repository[apt.postgresql.org]').run_action(:add)
   end
 
-  node['postgresql']['client']['packages'].each do |pg_pack|
+  node['rackspace_postgresql']['client']['packages'].each do |pg_pack|
     resources("package[#{pg_pack}]").run_action(:install)
   end
-  
-  package "libpq-dev" do
+
+  package 'libpq-dev' do
     action :nothing
   end.run_action(:install)
 
   begin
-    chef_gem "pg"
+    chef_gem 'pg'
   rescue Gem::Installer::ExtensionBuildError => e
     # Are we an omnibus install?
     raise if RbConfig.ruby.scan(%r{(chef|opscode)}).empty?
@@ -86,7 +88,7 @@ EOS
     lib_builder = execute 'generate pg gem Makefile' do
       # [COOK-3490] pg gem install requires full path on RHEL
       if node['platform_family'] == 'rhel'
-        command "#{RbConfig.ruby} extconf.rb --with-pg-config=/usr/pgsql-#{node['postgresql']['version']}/bin/pg_config"
+        command "#{RbConfig.ruby} extconf.rb --with-pg-config=/usr/pgsql-#{node['rackspace_postgresql']['version']}/bin/pg_config"
       else
         command "#{RbConfig.ruby} extconf.rb"
       end
