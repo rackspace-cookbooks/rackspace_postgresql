@@ -18,7 +18,7 @@
 #
 
 default['rackspace_postgresql']['enable_pgdg_apt'] = false
-default['rackspace_postgresql']['server']['config_change_notify'] = :restart
+# default['rackspace_postgresql']['server']['config_change_notify'] = :restart
 
 case node['platform']
 when 'debian'

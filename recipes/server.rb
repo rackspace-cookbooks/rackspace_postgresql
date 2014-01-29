@@ -60,14 +60,14 @@ when 'debian'
   include_recipe 'rackspace_postgresql::server_debian'
 end
 
-change_notify = node['rackspace_postgresql']['server']['config_change_notify']
+# change_notify = node['rackspace_postgresql']['server']['config_change_notify']
 
 template "#{node['rackspace_postgresql']['dir']}/postgresql.conf" do
   source 'postgresql.conf.erb'
   owner 'postgres'
   group 'postgres'
   mode 0600
-  notifies change_notify, 'service[postgresql]', :immediately
+  notifies :reload, 'service[postgresql]', :immediately
 end
 
 template "#{node['rackspace_postgresql']['dir']}/pg_hba.conf" do
@@ -75,7 +75,7 @@ template "#{node['rackspace_postgresql']['dir']}/pg_hba.conf" do
   owner 'postgres'
   group 'postgres'
   mode 00600
-  notifies change_notify, 'service[postgresql]', :immediately
+  notifies :reload, 'service[postgresql]', :immediately
 end
 
 # NOTE: Consider two facts before modifying "assign-postgres-password":

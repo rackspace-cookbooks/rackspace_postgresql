@@ -57,10 +57,10 @@ rescue LoadError
     chef_gem 'pg'
   rescue Gem::Installer::ExtensionBuildError => e
     # Are we an omnibus install?
-    raise if RbConfig.ruby.scan(%r{(chef|opscode)}).empty?
+    raise if RbConfig.ruby.scan(/(chef|opscode)/).empty?
     # Still here, must be omnibus. Lets make this thing install!
     Chef::Log.warn 'Failed to properly build pg gem. Forcing properly linking and retrying (omnibus fix)'
-    gem_dir = e.message.scan(%r{will remain installed in ([^ ]+)}).flatten.first
+    gem_dir = e.message.scan(/will remain installed in ([^ ]+)/).flatten.first
     raise unless gem_dir
     gem_name = File.basename(gem_dir)
     ext_dir = File.join(gem_dir, 'ext')
