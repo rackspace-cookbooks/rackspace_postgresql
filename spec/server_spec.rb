@@ -2,11 +2,13 @@ require 'spec_helper'
 
 describe 'rackspace_postgresql::server' do
   let(:centos6_run) do
-    ChefSpec::Runner.new(platform: 'centos') do |node|
+    ChefSpec::Runner.new(platform: 'centos', version: '6.4') do |node|
+      node.set['rackspace_postgresql']['password']['postgres'] = 'idontlikerandompasswords'
     end.converge(described_recipe)
   end
   let(:ubuntu_1204_run) do
-    ChefSpec::Runner.new(platform: 'ubuntu') do |node|
+    ChefSpec::Runner.new(platform: 'ubuntu', version: '12.04') do |node|
+      node.set['rackspace_postgresql']['password']['postgres'] = 'idontlikerandompasswords'
     end.converge(described_recipe)
   end
 
@@ -23,7 +25,7 @@ describe 'rackspace_postgresql::server' do
   end
 end
 
-describe 'rackspace_mysql::_server_rhel.rb' do
-  let(:centos6_run) { ChefSpec::Runner.new(platform: 'centos').converge(described_recipe) }
-  let(:ubuntu_1204_run) { ChefSpec::Runner.new(platform: 'ubuntu').converge(described_recipe) }
+describe 'rackspace_postgresql::server_rhel.rb' do
+  let(:centos6_run) { ChefSpec::Runner.new(platform: 'centos', version: '6.4').converge(described_recipe) }
+  let(:ubuntu_1204_run) { ChefSpec::Runner.new(platform: 'ubuntu', version: '12.04').converge(described_recipe) }
 end
