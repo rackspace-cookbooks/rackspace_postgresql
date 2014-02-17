@@ -11,6 +11,5 @@ group :integration do
   cookbook 'minitest-handler'
   cookbook 'openssl', '~> 1.1'
   rackspace_cookbook 'rackspace_apt', '~> 3.0'
-  rackspace_cookbook 'rackspace_yum', '~> 4.0'
   rackspace_cookbook 'rackspace_build_essential', '~> 2.0'
 end
