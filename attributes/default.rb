@@ -160,7 +160,7 @@ when 'redhat', 'centos'
       method: 'md5' }
   ]
 
-  default['rackspace_postgresql']['password'] = "thiswillbecomearandompassword"
+  default['rackspace_postgresql']['password'] = 'thiswillbecomearandompassword'
 
   case node['platform_family']
   when 'debian'

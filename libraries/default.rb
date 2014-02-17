@@ -1,5 +1,4 @@
-#
-# Cookbook Name:: postgresql
+# Cookbook Name:: rackspace_postgresql
 # Library:: default
 # Author:: David Crane (<davidc@donorschoose.org>)
 # Author:: Matthew Thode (<matt.thode@rackspace.org>)

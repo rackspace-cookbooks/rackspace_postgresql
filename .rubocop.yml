@@ -1,3 +1,6 @@
+AllCops:
+  Excludes:
+    - libraries/helpers.rb
 # Disable requirement of "encoding" headers on files
 Encoding:
   Enabled: false
