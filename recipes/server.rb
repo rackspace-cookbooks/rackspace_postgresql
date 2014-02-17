@@ -26,7 +26,7 @@ require 'digest/md5'
 if node['rackspace_postgresql']['password'] == 'thiswillbecomearandompassword'
   ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 else
-  secure_password = Digest::MD5.hexdigest("#{node['rackspace_postgresql']['password']}")
+  secure_password = Digest::MD5.hexdigest(node['rackspace_postgresql']['password'])
 end
 
 include_recipe 'rackspace_postgresql::client'
