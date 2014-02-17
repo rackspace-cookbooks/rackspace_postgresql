@@ -21,7 +21,13 @@
 # limitations under the License.
 #
 
-::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
+require 'digest/md5'
+
+if node['rackspace_postgresql']['password'] == "thiswillbecomearandompassword"
+  ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
+else
+  secure_password = Digest::MD5.hexdigest("#{node['rackspace_postgresql']['password']}")
+end
 
 include_recipe 'rackspace_postgresql::client'
 
@@ -51,6 +57,7 @@ else
   node.save
 end
 
+
 # Include the right "family" recipe for installing the server
 # since they do things slightly differently.
 case node['platform_family']
@@ -63,6 +70,7 @@ end
 # change_notify = node['rackspace_postgresql']['server']['config_change_notify']
 
 template "#{node['rackspace_postgresql']['dir']}/postgresql.conf" do
+  helpers(Format)
   source 'postgresql.conf.erb'
   owner 'postgres'
   group 'postgres'
@@ -82,10 +90,6 @@ end
 # (1) Passing the "ALTER ROLE ..." through the psql command only works
 #     if passwordless authorization was configured for local connections.
 #     For example, if pg_hba.conf has a "local all postgres ident" rule.
-# (2) It is probably fruitless to optimize this with a not_if to avoid
-#     setting the same password. This chef recipe doesn't have access to
-#     the plain text password, and testing the encrypted (md5 digest)
-#     version is not straight-forward.
 bash 'assign-postgres-password' do
   user 'postgres'
   code <<-EOH

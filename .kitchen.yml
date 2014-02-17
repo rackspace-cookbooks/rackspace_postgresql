@@ -1,24 +1,99 @@
----
-driver:
-  name: rackspace
-  require_chef_omnibus: '11.8.2'
-  rackspace_username: <%= ENV['rackspace_username'] %>
-  rackspace_api_key:  <%= ENV['rackspace_api_key'] %>
-  rackspace_region: 'ord'
-  public_key_path: <%= ENV['sshpubkey'] %>
-  ssh_key: <%= ENV['ssh_key'] %>
+driver_plugin: vagrant
+driver_config:
+  require_chef_omnibus: true
 
 platforms:
-- name: centos-6.4
-  driver_config:
-    image_id: 'f70ed7c7-b42e-4d77-83d8-40fa29825b85'
-- name: ubuntu-12.04
-  driver_config:
-    image_id: '80fbcb55-b206-41f9-9bc2-2dd7aac6c061'
-  run_list:
-  - recipe[rackspace_postgresql]
-- name: debian-7.2
-  driver_config:
-    image_id: '857d7d36-34f3-409f-8435-693e8797be8b'
-  run_list:
-  - recipe[rackspace_postgresql]
+  - name: ubuntu-12.04
+    driver_config:
+      image_id: '80fbcb55-b206-41f9-9bc2-2dd7aac6c061'
+      box: opscode-ubuntu-12.04
+      box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box
+    run_list:
+      - recipe[rackspace_apt::default]
+      - recipe[rackspace_postgresql::default]
+    attributes:
+      rackspace_postgresql:
+        password:
+          postgres: "Idontlikerandompassowords"
+        config:
+          port: "5432"
+          data_directory: "'/var/lib/postgresql/9.1/main'"
+          hba_file: "'/etc/postgresql/9.1/main/pg_hba.conf'"
+          ident_file: "'/etc/postgresql/9.1/main/pg_ident.conf'"
+          external_pid_file: "'/var/run/postgresql/9.1-main.pid'"
+          log_filename: "'postgresql-%a.log'"
+          datestyle: "'iso, mdy'"
+          default_text_search_config: "'pg_catalog.english'"
+        pg_hba:
+          [{type: 'local', db: 'all', user: 'postgres', addr: "", method: 'ident'},
+          {type: 'local', db: 'all', user: 'all', addr: "", method: 'ident'},
+          {type: 'host', db: 'all', user: 'all', addr: '127.0.0.1/32', method: 'md5'},
+          {type: 'host', db: 'all', user: 'all', addr: '::1/128', method: 'md5'}]
+      rackspace_apt:
+        switch:
+          delete_sources_list: true
+  - name: debian-7.2
+    driver_config:
+      image_id: '857d7d36-34f3-409f-8435-693e8797be8b'
+      box: opscode-debian-7.2.0
+      box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_debian-7.2.0_chef-provisionerless.box
+    run_list:
+      - recipe[rackspace_apt::default]
+      - recipe[rackspace_postgresql::default]
+    attributes:
+      rackspace_postgresql:
+        password:
+          postgres: "Idontlikerandompassowords"
+        config:
+          port: "5432"
+          data_directory: "'/var/lib/postgresql/9.1/main'"
+          hba_file: "'/etc/postgresql/9.1/main/pg_hba.conf'"
+          ident_file: "'/etc/postgresql/9.1/main/pg_ident.conf'"
+          external_pid_file: "'/var/run/postgresql/9.1-main.pid'"
+          log_filename: "'postgresql-%a.log'"
+          datestyle: "'iso, mdy'"
+          default_text_search_config: "'pg_catalog.english'"
+        pg_hba:
+          [{type: 'local', db: 'all', user: 'postgres', addr: nil, method: 'ident'},
+          {type: 'local', db: 'all', user: 'all', addr: nil, method: 'ident'},
+          {type: 'host', db: 'all', user: 'all', addr: '127.0.0.1/32', method: 'md5'},
+          {type: 'host', db: 'all', user: 'all', addr: '::1/128', method: 'md5'}]
+      rackspace_apt:
+        switch:
+          delete_sources_list: true
+  - name: centos-6.4
+    driver_config:
+      image_id: 'f70ed7c7-b42e-4d77-83d8-40fa29825b85'
+      box: opscode-centos-6.4
+      box_url: http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-6.4_chef-provisionerless.box
+    run_list:
+      - recipe[rackspace_postgresql::default]
+    attributes:
+      rackspace_postgresql:
+        password:
+          postgres: "Idontlikerandompassowords"
+        config:
+          port: "5432"
+          data_directory: "'/var/lib/pgsql/data'"
+          hba_file: "'/var/lib/pgsql/data/pg_hba.conf'"
+          ident_file: "'/var/lib/pgsql/data/pg_ident.conf'"
+          external_pid_file: "'/var/lib/pgsql/main.pid'"
+          log_filename: "'postgresql-%a.log'"
+          datestyle: "'iso, mdy'"
+          default_text_search_config: "'pg_catalog.english'"
+        pg_hba:
+          [{type: 'local', db: 'all', user: 'postgres', addr: "", method: 'ident'},
+          {type: 'local', db: 'all', user: 'all', addr: "", method: 'ident'},
+          {type: 'host', db: 'all', user: 'all', addr: '127.0.0.1/32', method: 'md5'},
+          {type: 'host', db: 'all', user: 'all', addr: '::1/128', method: 'md5'}]
+
+suites:
+  - name: client
+    run_list:
+      - recipe[rackspace_postgresql::client]
+  - name: ruby
+    run_list:
+      - recipe[rackspace_postgresql::ruby]
+  - name: server
+    run_list:
+      - recipe[rackspace_postgresql::server]

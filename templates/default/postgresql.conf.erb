@@ -3,18 +3,25 @@
 # Please refer to the PostgreSQL documentation for details on
 # configuration settings.
 
-<% node['rackspace_postgresql']['config'].sort.each do |key, value| %>
-<% next if value.nil? -%>
-<%= key %> = <%=
-  case value
-  when String
-    "'#{value}'"
-  when TrueClass
-    'on'
-  when FalseClass
-    'off'
-  else
-    value
-  end
-%>
-<% end %>
+<%# keys = node['rackspace_postgresql']['config'].keys.sort %>
+<%# keys.each {|key| node['rackspace_postgresql']['config'][key]}.each_value do |value| %>
+<%# node['rackspace_postgresql']['config'].sort.each do |key, value| -%>
+<%# next if value.nil? -%>
+<%# next if value.to_s.empty? -%>
+
+<%# case value -%>
+<%# when String -%>
+  <%#= "#{key} = #{value}" %>
+<%# when TrueClass -%>
+  <%#= "#{key} = 'on'" %>
+<%# when FalseClass -%>
+  <%#= "#{key} = 'off'" %>
+<%# else -%>
+  <%#= "#{key} = #{value}" %>
+<%# end -%>
+<%# end %>
+
+<% format_postgresql_config(node['rackspace_postgresql']['config']).each do |line| -%>
+<%= line %>
+<% end -%>
+
