@@ -4,7 +4,6 @@
 require 'bundler'
 require 'bundler/setup'
 require 'berkshelf/thor'
-require 'strainer/thor'
 
 class Default < Thor
 
