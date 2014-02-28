@@ -1,8 +1,9 @@
 #
-# Cookbook Name:: postgresql
+# Cookbook Name:: rackspace_postgresql
 # Recipe::yum_pgdg_postgresql
 #
 # Copyright 2013, DonorsChoose.org
+# Copyright 2014, Rackspace, US Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,7 +36,7 @@ repo_rpm_url, repo_rpm_filename, repo_rpm_package = pgdgrepo_rpm_info
 # Download the PGDG repository RPM as a local file
 remote_file "#{Chef::Config[:file_cache_path]}/#{repo_rpm_filename}" do
   source repo_rpm_url
-  mode "0644"
+  mode '0644'
 end
 
 # Install the PGDG repository RPM from the local file

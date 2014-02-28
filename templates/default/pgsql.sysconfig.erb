@@ -1,4 +1,4 @@
-PGDATA=<%= node['postgresql']['dir'] %>
-<% if node['postgresql']['config'].attribute?("port") -%>
-PGPORT=<%= node['postgresql']['config']['port'] %>
+PGDATA=<%= node['rackspace_postgresql']['dir'] %>
+<% if node['rackspace_postgresql']['config'].attribute?("port") -%>
+PGPORT=<%= node['rackspace_postgresql']['config']['port'] %>
 <% end -%>

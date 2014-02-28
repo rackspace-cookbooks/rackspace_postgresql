@@ -1,10 +1,12 @@
 #
-# Cookbook Name:: postgresql
+# Cookbook Name:: rackspace_postgresql
 # Recipe:: server
 #
 # Author:: Joshua Timberman (<joshua@opscode.com>)
 # Author:: Lamont Granquist (<lamont@opscode.com>)#
+# Author:: Matthew Thode (<matt.thode@rackspace.com>)
 # Copyright 2009-2011, Opscode, Inc.
+# Copyright 2014, Rackspace, US Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,16 +21,16 @@
 # limitations under the License.
 #
 
-include_recipe "postgresql::client"
+include_recipe 'rackspace_postgresql::client'
 
-node['postgresql']['server']['packages'].each do |pg_pack|
+node['rackspace_postgresql']['server']['packages'].each do |pg_pack|
 
   package pg_pack
 
 end
 
-service "postgresql" do
-  service_name node['postgresql']['server']['service_name']
-  supports :restart => true, :status => true, :reload => true
+service 'postgresql' do
+  service_name node['rackspace_postgresql']['server']['service_name']
+  supports restart: true, status: true, reload: true
   action [:enable, :start]
 end

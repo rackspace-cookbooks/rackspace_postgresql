@@ -6,16 +6,16 @@
 # Refer to the "Client Authentication" section in the PostgreSQL
 # documentation for a complete description of this file.
 
-<% if node['postgresql']['version'].to_f < 9.1 -%>
+<% if node['rackspace_postgresql']['version'].to_f < 9.1 -%>
 # TYPE  DATABASE        USER            CIDR-ADDRESS            METHOD
-<% elsif node['postgresql']['version'].to_f >= 9.1 -%>
+<% elsif node['rackspace_postgresql']['version'].to_f >= 9.1 -%>
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
 <% end -%>
 
 ###########
 # Other authentication configurations taken from chef node defaults:
 ###########
-<% node['postgresql']['pg_hba'].each do |auth| -%>
+<% node['rackspace_postgresql']['pg_hba'].each do |auth| -%>
 
 <%   if auth[:comment] %>
 <%= auth[:comment] %>
@@ -28,8 +28,8 @@
 <% end %>
 
 # "local" is for Unix domain socket connections only
-<% if node['postgresql']['version'].to_f < 9.1 -%>
+<% if node['rackspace_postgresql']['version'].to_f < 9.1 -%>
 local   all             all                                     ident
-<% elsif node['postgresql']['version'].to_f >= 9.1 -%>
+<% elsif node['rackspace_postgresql']['version'].to_f >= 9.1 -%>
 local   all             all                                     peer
 <% end -%>

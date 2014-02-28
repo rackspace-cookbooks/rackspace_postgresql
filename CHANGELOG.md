@@ -1,7 +1,10 @@
-postgresql Cookbook CHANGELOG
+rackspace_postgresql Cookbook CHANGELOG
 =============================
 This file is used to list changes made in each version of the postgresql cookbook.
 
+4.0.0
+-----
+Rackspace Rebuild
 
 v3.3.4
 ------
